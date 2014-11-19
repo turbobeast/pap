@@ -4,6 +4,9 @@ var Pap = (function () {
 
     pap.smear = function (imageData, radius) {
 
+        var newData = document.createElement('canvas').getContext('2d').getImageData(0,0,imageData.width, imageData.height);
+
+        newData.data.set(imageData.data);
 
         var columns = imageData.width;
         var rows = imageData.height;
@@ -140,14 +143,13 @@ var Pap = (function () {
 
             var blur = chunks[currentRow][currentColumn][0];
 
-            imageData.data[k] = blur.r;
-            imageData.data[k + 1] = blur.g;
-            imageData.data[k + 2] = blur.b;
-
+            newData.data[k] = blur.r;
+            newData.data[k + 1] = blur.g;
+            newData.data[k + 2] = blur.b;
 
         }
 
-        return imageData;
+        return newData;
 
     };
 
