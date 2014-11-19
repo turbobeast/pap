@@ -1,16 +1,28 @@
 var Pap = (function () {
+    'use strict';
+
+
     var pap = {};
+
+    function powerofTwo (num) {
+        return !!( (num & (num - 1)) == 0 );
+    }
 
 
     pap.smear = function (imageData, radius) {
 
+
+        if(!powerofTwo(radius)) {
+            console.warn('pixel size should be power of two for best results');
+        }
+        
         var newData = document.createElement('canvas').getContext('2d').getImageData(0,0,imageData.width, imageData.height);
 
         newData.data.set(imageData.data);
 
         var columns = imageData.width;
         var rows = imageData.height;
-        var chunkWidth = radius * 2; //112;
+        var chunkWidth = radius; //112;
         var chunks = [];
 
         var currentRow = 0;
