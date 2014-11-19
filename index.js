@@ -34,14 +34,6 @@ var Pap = (function () {
         var totalChunkColumns = imageData.width / chunkWidth;
         var totalChunkRows = imageData.height / chunkWidth;
 
-
-        for(var j = 0; j < totalChunkRows; j += 1) {
-            chunks[j] = [];
-            for(var c = 0; c < totalChunkColumns; c += 1) {
-                chunks[j][c] = [];
-            }
-        }
-
         for(var k = 0; k < imageData.data.length; k += 4) {
             c += 1;
 
@@ -70,15 +62,16 @@ var Pap = (function () {
                 }
             }
 
-            chunks[currentRow][currentColumn].push(pixel);
-            if(currentColumn % 2 === 0) {
-                if(currentRow % 2 === 0) {
-                    imageData.data[k] = imageData.data[k] / 2;
-                    imageData.data[k + 1] = imageData.data[k + 1] / 2;
-                    imageData.data[k + 2] = imageData.data[k + 2] / 2;
 
-                }
+            if(chunks[currentRow] === undefined) {
+                chunks[currentRow] = [];
             }
+
+            if(chunks[currentRow][currentColumn] === undefined) {
+                chunks[currentRow][currentColumn] = [];
+            }
+
+            chunks[currentRow][currentColumn].push(pixel);
 
         }
 
