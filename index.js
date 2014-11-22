@@ -183,6 +183,104 @@ var Pap = (function () {
 
     };
 
+
+    function calculateOffsets (radius, sampleSize, rowSize) {
+
+        var i = 0,
+        c = 0,
+        sampleOffsets = [],
+        rowOffset = 0,
+        columnOffset = 0;
+
+
+        for(i = 0; i < sampleSize; i += 1) {
+            rowOffset = (-radius + i) * rowSize;
+
+            for(c = 0; c < sampleSize; c += 1) {
+
+                columnOffset = (-radius + c);
+
+                sampleOffsets.push( rowOffset + columnOffset );
+            }
+
+        }
+
+        return sampleOffsets;
+    }
+
+
+
+    pap.gaussian = function (imageData, radius) {
+
+        var newData = document.createElement('canvas').getContext('2d').getImageData(0,0,imageData.width, imageData.height),
+        rowSize = imageData.width,
+        sampleOffsets = [],
+        sampleSize = ((radius * 2) + 1),
+        red = 0,
+        green = 0,
+        blue = 0,
+        numReds = 0,
+        numGreens = 0,
+        numBlues = 0,
+        totalRedVal = 0,
+        totalGreenVal = 0,
+        totalBlueVal = 0,
+        offset = 0,
+        i = 0,
+        j = 0;
+
+        newData.data.set(imageData.data);
+        sampleOffsets = calculateOffsets(radius, sampleSize, rowSize);
+
+
+        for(i = 0; i < imageData.data.length; i += 4) {
+
+
+            red = i;
+            green = i + 1;
+            blue = i + 2;
+
+            numReds = 0;
+            numGreens = 0;
+            numBlues = 0;
+
+            totalRedVal = 0;
+            totalGreenVal = 0;
+            totalBlueVal = 0;
+
+            for(j = 0; j < sampleOffsets.length; j += 1) {
+
+                offset = sampleOffsets[j] * 4;
+
+                if(imageData.data[red + offset ] !== undefined) {
+                    totalRedVal += imageData.data[red + offset ];
+                    numReds += 1;
+                }
+
+                if(imageData.data[green + offset ] !== undefined) {
+                    totalGreenVal += imageData.data[green + offset ];
+                    numGreens += 1;
+                }
+
+                if(imageData.data[blue + offset ] !== undefined) {
+                    totalBlueVal += imageData.data[blue + offset ];
+                    numBlues += 1;
+                }
+
+            }
+
+            newData.data[red] = ( totalRedVal / numReds );
+            newData.data[green] = (totalGreenVal / numGreens );
+            newData.data[blue] = (totalBlueVal / numBlues );
+
+        }
+
+
+        return newData;
+
+
+    };
+
     return pap;
 
 }());
