@@ -2,5 +2,12 @@
     "name" : "pap",
     "version" : "0.0.1",
     "description" : "Make canvas images blurry",
-    "main": "./index.js"
+    "main": "./index.js",
+    "repository" : {
+        "type" : "git",
+        "url" : "https://github.com/turbobeast/pap.git"
+    },
+    "keywords" : [ "imageData", "blur" ],
+    "author" : "George Michael Faust",
+    "license" : "MIT"
 }
