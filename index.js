@@ -184,38 +184,50 @@ var Pap = (function () {
     };
 
 
-    function calculateOffsets (radius, sampleSize, rowSize) {
+    function calculateRowOffsets (radius, sampleSize, rowSize) {
 
         var i = 0,
-        c = 0,
         sampleOffsets = [],
-        rowOffset = 0,
-        columnOffset = 0;
-
+        rowOffset = 0;
 
         for(i = 0; i < sampleSize; i += 1) {
-            rowOffset = (-radius + i) * rowSize;
 
-            for(c = 0; c < sampleSize; c += 1) {
-
-                columnOffset = (-radius + c);
-
-                sampleOffsets.push( rowOffset + columnOffset );
-            }
+            rowOffset = ( (-radius + i) * rowSize ) * 4;
+            sampleOffsets.push(rowOffset);
 
         }
+
 
         return sampleOffsets;
     }
 
 
+    
 
-    pap.gaussian = function (imageData, radius) {
+    function calculateColumnOffsets (radius, sampleSize) {
 
-        var newData = document.createElement('canvas').getContext('2d').getImageData(0,0,imageData.width, imageData.height),
-        rowSize = imageData.width,
+        var c = 0,
         sampleOffsets = [],
-        sampleSize = ((radius * 2) + 1),
+        columnOffset = 0;
+
+        for(c = 0; c < sampleSize; c += 1) {
+
+            columnOffset = (-radius + c) * 4;
+            sampleOffsets.push( columnOffset );
+        }
+
+
+        return sampleOffsets;
+
+    }
+
+
+    function blurIteration (sampleData, sampleOffsets) {
+
+        var newData = document.createElement('canvas').getContext('2d').getImageData(0,0,sampleData.width, sampleData.height),
+        i = 0,
+        j = 0,
+        offset = 0,
         red = 0,
         green = 0,
         blue = 0,
@@ -224,16 +236,12 @@ var Pap = (function () {
         numBlues = 0,
         totalRedVal = 0,
         totalGreenVal = 0,
-        totalBlueVal = 0,
-        offset = 0,
-        i = 0,
-        j = 0;
-
-        newData.data.set(imageData.data);
-        sampleOffsets = calculateOffsets(radius, sampleSize, rowSize);
+        totalBlueVal = 0;
 
 
-        for(i = 0; i < imageData.data.length; i += 4) {
+        newData.data.set(sampleData.data);
+
+        for(i = 0; i < sampleData.data.length; i += 4) {
 
 
             red = i;
@@ -250,20 +258,20 @@ var Pap = (function () {
 
             for(j = 0; j < sampleOffsets.length; j += 1) {
 
-                offset = sampleOffsets[j] * 4;
+                offset = sampleOffsets[j];
 
-                if(imageData.data[red + offset ] !== undefined) {
-                    totalRedVal += imageData.data[red + offset ];
+                if(sampleData.data[red + offset ] !== undefined) {
+                    totalRedVal += sampleData.data[red + offset ];
                     numReds += 1;
                 }
 
-                if(imageData.data[green + offset ] !== undefined) {
-                    totalGreenVal += imageData.data[green + offset ];
+                if(sampleData.data[green + offset ] !== undefined) {
+                    totalGreenVal += sampleData.data[green + offset ];
                     numGreens += 1;
                 }
 
-                if(imageData.data[blue + offset ] !== undefined) {
-                    totalBlueVal += imageData.data[blue + offset ];
+                if(sampleData.data[blue + offset ] !== undefined) {
+                    totalBlueVal += sampleData.data[blue + offset ];
                     numBlues += 1;
                 }
 
@@ -275,6 +283,22 @@ var Pap = (function () {
 
         }
 
+        return newData;
+    }
+
+
+    pap.gaussian = function (imageData, radius) {
+
+        var newData = null,
+        rowSize = imageData.width,
+        columnOffsets = [],
+        rowOffsets = [],
+        sampleSize = ((radius * 2) + 1);
+
+        columnOffsets = calculateColumnOffsets(radius, sampleSize );
+        rowOffsets = calculateRowOffsets(radius, sampleSize, rowSize);
+        newData = blurIteration(imageData, columnOffsets);
+        newData = blurIteration(newData, rowOffsets);
 
         return newData;
 
