@@ -1,5 +1,7 @@
 ## Pap
 
+[![NPM](https://nodei.co/npm/pap.png)](https://www.npmjs.org/package/pap)
+
 Terrible little module that pixelates imageData then returns it.
 
 Import the module.
