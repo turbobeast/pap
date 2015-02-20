@@ -38,4 +38,19 @@ var pixelated = Pap.smear(imageData, 16);
 context.putImageData(pixelated, 0, 0);
 ```
 
-...disgusting.
+Gaussian blur is nice too.
+
+```javascript
+var blurry = Pap.gaussian(imageData, 16);
+context.putImageData(blurry, 0, 0 );
+```
+
+![blurry jenelle](https://cloud.githubusercontent.com/assets/1766472/6281175/0170a502-b889-11e4-9dac-b304c2ade08b.png)
+
+
+There is also motion blur for horizontal only blurring.
+
+```javascript
+var speedy = Pap.motionBlur(imageData, 24);
+context.putImageData(speedy, 0, 0);
+```

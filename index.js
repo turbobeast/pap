@@ -8,6 +8,9 @@ var Pap = (function () {
         return !!( (num & (num - 1)) === 0 );
     }
 
+
+
+
     function pushPixelsIntoChunks (pixelData, chunkSize, totalChunkColumns) {
 
         var chunks = [],
@@ -63,7 +66,11 @@ var Pap = (function () {
     }
 
 
-
+    /**
+     * loop through sample data and average out RGB channels
+     * @param {Array} chunks -- a sample set of image data
+     * @return {Array} returned sample with averaged out colors
+     */
     function averageOutChunkColors (chunks) {
 
         var i = 0,
@@ -118,6 +125,7 @@ var Pap = (function () {
     }
 
 
+
     function pushChunksIntoImageData (newData, chunks, chunkSize, totalChunkColumns) {
 
         var i = 0,
@@ -160,6 +168,13 @@ var Pap = (function () {
     }
 
 
+    /**
+     * blur effect
+     * hopefully pixelated, but who knows
+     * @param  {Array} imageData -- the array of image data
+     * @param  {Number} size      -- sample size for pixelation
+     * @return {Array}           -- pixelated image data
+     */
     pap.smear = function (imageData, size) {
 
 
@@ -183,7 +198,12 @@ var Pap = (function () {
 
     };
 
-
+    /**
+     * calculates the positions of sample offset indices
+     * from pixels vertical to current pixel
+     * @param {Number} radius     -- how far to go
+     * @param {Number} sampleSize -- how many indices to push into array
+     */
     function calculateRowOffsets (radius, sampleSize, rowSize) {
 
         var i = 0,
@@ -202,8 +222,13 @@ var Pap = (function () {
     }
 
 
-    
 
+    /**
+     * calculates positions of the sample offset indices
+     * from pixels horizontal to current pixel
+     * @param {Number} radius     -- how far to go
+     * @param {Number} sampleSize -- how many indices to push into array
+     */
     function calculateColumnOffsets (radius, sampleSize) {
 
         var c = 0,
@@ -221,7 +246,11 @@ var Pap = (function () {
 
     }
 
-
+    /**
+     * averages out red green and blue samples values and pushes them back into array
+     * @param {Array} sampleData    -- the image data
+     * @param {Array} sampleOffsets -- the array of index offsets to sample data from
+     */
     function blurIteration (sampleData, sampleOffsets) {
 
         var newData = document.createElement('canvas').getContext('2d').getImageData(0,0,sampleData.width, sampleData.height),
@@ -286,7 +315,12 @@ var Pap = (function () {
         return newData;
     }
 
-
+    /**
+     * takes in image data, returns blurred image data
+     * @param  {Array} imageData -- array of image data (context.getImageData())
+     * @param  {Number} radius    -- desired radius of blur, more is blurrier, but slower
+     * @return {Array}           -- blurry version of image data
+     */
     pap.gaussian = function (imageData, radius) {
 
         var newData = null,
@@ -304,6 +338,30 @@ var Pap = (function () {
 
 
     };
+
+
+    /**
+     * takes in image data, returns blurred image data
+     * same as gaussian but only blurred horizontally
+     * @param  {Array} imageData -- array of image data (context.getImageData())
+     * @param  {Number} radius    -- desired distance of blur, more is blurrier
+     * @return {Array}           -- motion blurred version of image data
+     */
+     pap.motionBlur = function (imageData, dist) {
+
+         var newData = null,
+         rowSize = imageData.width,
+         columnOffsets = [],
+         sampleSize = ((dist * 2) + 1);
+
+         columnOffsets = calculateColumnOffsets(dist, sampleSize );
+         newData = blurIteration(imageData, columnOffsets);
+
+         return newData;
+
+     };
+
+     
 
     return pap;
 

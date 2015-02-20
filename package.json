@@ -1,6 +1,6 @@
 {
     "name" : "pap",
-    "version" : "0.2.0",
+    "version" : "0.3.0",
     "description" : "Make canvas images blurry",
     "main": "./index.js",
     "repository" : {
