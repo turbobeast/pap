@@ -10,7 +10,6 @@ var Pap = (function () {
     var context = false;
 
     for(var i = 0; i < cTexts.length; i+= 1) {
-        console.log('trying');
         try {
             context = canvas.getContext(cTexts[i]);
         } catch (e) {
@@ -22,7 +21,6 @@ var Pap = (function () {
         }
     }
 
-    console.log(context);
     if(context === false) {
         console.warn("Pap -- WebGL Not Supported. Image blur performance will suffer greatly");
         return imagedata_pap;

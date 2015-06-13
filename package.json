@@ -1,7 +1,7 @@
 {
   "name": "pap",
-  "version": "0.4.0",
-  "description": "Make canvas images blurry",
+  "version": "0.4.1",
+  "description": "Blurs images and renders them to a canvas element",
   "main": "./index.js",
   "repository": {
     "type": "git",
@@ -9,7 +9,10 @@
   },
   "keywords": [
     "imageData",
-    "blur"
+    "blur",
+    "glsl",
+    "webgl",
+    "canvas"
   ],
   "author": "George Michael Faust",
   "license": "MIT",
