@@ -77,7 +77,7 @@ var webgl_pap = function () {
      * @param {Number} - radius
      * @return {null}
      */
-    pap.blur = function (radius) {
+    pap.blur = function (radius, callback) {
 
         gl.useProgram(program);
         gl.uniform1i(uRad, radius);
@@ -100,8 +100,10 @@ var webgl_pap = function () {
         gl.clearColor(0.0,0.0,0.0,1);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        //return pcanvas;
-
+        
+        if(typeof callback === "function") {
+          callback();
+        }
     };
 
     return pap;

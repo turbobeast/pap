@@ -1,4 +1,6 @@
 "use strict";
+var workify = require('webworkify');
+var worker = workify(require('./worker.js'));
 
 var imagedata_pap = function () {
 
@@ -8,7 +10,6 @@ var imagedata_pap = function () {
     ctx,
     imageData;
 
-
     /**
      * calculates the positions of sample offset indices
      * from pixels vertical to current pixel
@@ -16,23 +17,16 @@ var imagedata_pap = function () {
      * @param {Number} sampleSize -- how many indices to push into array
      */
     function calculateRowOffsets (radius, sampleSize, rowSize) {
-
         var i = 0,
         sampleOffsets = [],
         rowOffset = 0;
 
         for(i = 0; i < sampleSize; i += 1) {
-
             rowOffset = ( (-radius + i) * rowSize ) * 4;
             sampleOffsets.push(rowOffset);
-
         }
-
         return sampleOffsets;
-
     }
-
-
 
     /**
      * calculates positions of the sample offset indices
@@ -41,93 +35,28 @@ var imagedata_pap = function () {
      * @param {Number} sampleSize -- how many indices to push into array
      */
     function calculateColumnOffsets (radius, sampleSize) {
-
         var c = 0,
         sampleOffsets = [],
         columnOffset = 0;
 
         for(c = 0; c < sampleSize; c += 1) {
-
             columnOffset = (-radius + c) * 4;
             sampleOffsets.push( columnOffset );
         }
 
         return sampleOffsets;
-
-    }
-
-    /**
-     * averages out red green and blue samples values and pushes them back into array
-     * @param {Array} sampleData    -- the image data
-     * @param {Array} sampleOffsets -- the array of index offsets to sample data from
-     */
-    function blurIteration (sampleData, sampleOffsets) {
-
-        var newData = document.createElement('canvas').getContext('2d').getImageData(0,0,sampleData.width, sampleData.height),
-        i = 0,
-        j = 0,
-        offset = 0,
-        red = 0,
-        green = 0,
-        blue = 0,
-        numReds = 0,
-        numGreens = 0,
-        numBlues = 0,
-        totalRedVal = 0,
-        totalGreenVal = 0,
-        totalBlueVal = 0;
-
-
-        newData.data.set(sampleData.data);
-
-        for(i = 0; i < sampleData.data.length; i += 4) {
-
-
-            red = i;
-            green = i + 1;
-            blue = i + 2;
-
-            numReds = 0;
-            numGreens = 0;
-            numBlues = 0;
-
-            totalRedVal = 0;
-            totalGreenVal = 0;
-            totalBlueVal = 0;
-
-            for(j = 0; j < sampleOffsets.length; j += 1) {
-
-                offset = sampleOffsets[j];
-
-                if(sampleData.data[red + offset ] !== undefined) {
-                    totalRedVal += sampleData.data[red + offset ];
-                    numReds += 1;
-                }
-
-                if(sampleData.data[green + offset ] !== undefined) {
-                    totalGreenVal += sampleData.data[green + offset ];
-                    numGreens += 1;
-                }
-
-                if(sampleData.data[blue + offset ] !== undefined) {
-                    totalBlueVal += sampleData.data[blue + offset ];
-                    numBlues += 1;
-                }
-
-            }
-
-            newData.data[red] = ( totalRedVal / numReds );
-            newData.data[green] = (totalGreenVal / numGreens );
-            newData.data[blue] = (totalBlueVal / numBlues );
-
-        }
-
-        return newData;
-
     }
 
 
-
+    function blurIteration (imageData, offsets, direction) {
+        var blankData = document.createElement('canvas').getContext('2d').getImageData(0,0,imageData.width, imageData.height)
+        worker.postMessage({
+          blankData: blankData,
+          imageData: imageData,
+          offsets: offsets,
+          direction: direction
+        });
+    }
 
     imagedata_pap.initialize = function (image) {
 
@@ -148,7 +77,7 @@ var imagedata_pap = function () {
      * @param  {Number} radius    -- desired radius of blur, more is blurrier, but slower
      * @return {null}
      */
-     imagedata_pap.blur = function (radius) {
+     imagedata_pap.blur = function (radius, callback) {
 
         console.warn("Pap -- Keep blur radius low to help performance");
 
@@ -160,10 +89,19 @@ var imagedata_pap = function () {
 
         columnOffsets = calculateColumnOffsets(radius, sampleSize );
         rowOffsets = calculateRowOffsets(radius, sampleSize, rowSize);
-        newData = blurIteration(imageData, columnOffsets);
-        newData = blurIteration(newData, rowOffsets);
 
-        ctx.putImageData(newData, 0, 0);
+        worker.addEventListener("message", function (e) {
+          if(e.data.direction === "horizontal") {
+            return blurIteration(e.data.imageData, rowOffsets, "vertical");
+          }
+          newData = e.data.imageData;
+          ctx.putImageData(newData, 0, 0);
+          if(typeof callback === "function") {
+            callback();
+          }
+        });
+
+        blurIteration(imageData, columnOffsets, "horizontal");
 
     };
 
