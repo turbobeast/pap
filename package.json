@@ -17,10 +17,12 @@
   "author": "George Michael Faust",
   "license": "MIT",
   "dependencies": {
-    "glslify": "^2.1.2"
+    "glslify": "^2.1.2",
+    "webworkify": "^1.1.0"
   },
   "browserify": {
-      "transform": ["glslify"]
+    "transform": [
+      "glslify"
+    ]
   }
-
 }
