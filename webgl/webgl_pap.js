@@ -12,7 +12,7 @@ var GLFrameBuffer = require('./GLFrameBuffer');
 var fragmentShader = glslify('../shaders/blur.fragment.glsl');
 var vertexShader = glslify('../shaders/vertex.glsl');
 
-var webgl_pap = function () {
+var webgl_pap = function webgl_pap() {
 
     var pap = {
         canvas : null,
@@ -30,6 +30,25 @@ var webgl_pap = function () {
     uHorizontal,
     uSampler;
 
+    function getDimensions (elem) {
+        var w = 0;
+        var h = 0;
+        switch (elem.nodeName) {
+            case 'VIDEO':
+                w = elem.videoWidth;
+                h = elem.videoHeight;
+            break;
+            default:
+                w = elem.width;
+                h = elem.height;
+        }
+
+        return {
+            width: w,
+            height: h
+        };
+    }
+
     /**
      * creates webgl program
      * initializes texture
@@ -37,15 +56,16 @@ var webgl_pap = function () {
      * @param {HTMLImageElement} image
      * @return {null}
      */
-    pap.initialize = function (image) {
+    pap.initialize = function initialize(textureElement) {
+        var dimensions = getDimensions(textureElement);
+        width = dimensions.width;
+        height = dimensions.height;
 
-        width = image.width;
-        height = image.height;
         pap.canvas = document.createElement('canvas');
         pap.canvas.width = width;
         pap.canvas.height = height;
         gl = getContext(pap.canvas);
-        texture = new GLTexture(image);
+        texture = new GLTexture(textureElement);
         texture.create(gl);
 
         program = new GLProgram().create(gl, vertexShader, fragmentShader);
@@ -77,7 +97,7 @@ var webgl_pap = function () {
      * @param {Number} - radius
      * @return {null}
      */
-    pap.blur = function (radius, callback) {
+    pap.blur = function blur(radius, callback) {
 
         gl.useProgram(program);
         gl.uniform1i(uRad, radius);
@@ -100,7 +120,7 @@ var webgl_pap = function () {
         gl.clearColor(0.0,0.0,0.0,1);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        
+
         if(typeof callback === "function") {
           callback();
         }

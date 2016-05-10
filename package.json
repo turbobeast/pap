@@ -1,6 +1,6 @@
 {
   "name": "pap",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Blurs images and renders them to a canvas element",
   "main": "./index.js",
   "repository": {
