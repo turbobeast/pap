@@ -13,16 +13,15 @@ vec4 addColors () {
   vec2 pixelSize = vec2(1.0, 1.0) / vec2(uWidth, uHeight);
 
   for(int i = 2048; i >= 0; i -= 1) {
-
       if(i < (2048 - (uRadius * 2))) {
-          break;
+        break;
       }
 
       int offset = uRadius - (2048 - i);
       if(uHorizontal) {
-          colorSum += texture2D(uSampler, vTexCoord + (pixelSize * vec2(offset, 0) ));
+        colorSum += pow(texture2D(uSampler, vTexCoord + (pixelSize * vec2(offset, 0) )), vec4(2.2));
       } else {
-          colorSum += texture2D(uSampler, vTexCoord + (pixelSize * vec2(0, offset) ));
+        colorSum += pow(texture2D(uSampler, vTexCoord + (pixelSize * vec2(0, offset) )), vec4(2.2));
       }
   }
 
@@ -37,7 +36,7 @@ void main () {
       vec4 colorSum = addColors();
       float totes = ((float(uRadius) * 2.0) + 1.0) ;
       float divy = 1.0 / totes;
-      gl_FragColor = vec4(colorSum.rgb * divy, 1.0);
+      gl_FragColor = vec4(pow(colorSum.rgb * divy, vec3(1.0 / 2.2)), 1.0);
     }
 
 }
