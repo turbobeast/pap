@@ -7,37 +7,31 @@ Renders blurred versions of images to canvas.
 Import the module.
 
 ```javascript
-var pap = require('pap')();
+const pap = require('pap')();
 ```
 
 Load an image and draw it on a canvas.
 
 ```javascript
-var mage = document.createElement('image');
+const imageElement = document.createElement('image');
 
-mage.addEventListener("load", function () {
-
-    pap.initialize(mage);
+imageElement.addEventListener("load", function () {
+    pap.initialize(imageElement);
     pap.blur(64);
     document.body.appendChild(pap.canvas);
-
 });
 
-mage.src = "images/Lenna.png";
-
+imageElement.src = "images/kittens.jpg";
 ```
 
-
-![lennablur](https://cloud.githubusercontent.com/assets/1766472/8122391/30a330aa-1087-11e5-8443-607cbd2371a1.png)
-
-Initialize once, and update blur live. 
+Initialize once, and update blur live.
 
 
 ```javascript
-var Pap = require('pap');
-var mage = document.createElement('img');
-mage.onload = function () {
+const Pap = require('pap');
+const mage = document.createElement('img');
 
+mage.onload = function () {
     var pap = Pap();
     pap.initialize(mage);
     document.body.appendChild(pap.canvas);
@@ -49,7 +43,7 @@ mage.onload = function () {
     };
 
     blurWave();
-
 };
-mage.src = "images/Lenna.png";
+
+mage.src = "images/kittens.jpg";
 ```
